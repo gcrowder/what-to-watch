@@ -1,3 +1,5 @@
 .DS_Store
 .envrc
 .direnv
+ml100k.zip
+ml-100k

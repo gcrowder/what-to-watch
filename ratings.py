@@ -20,13 +20,24 @@ def get_movies():
 
 def get_users():
     users = {}
+    with open ('data') as f:
+        reader = csv.DictReader(f, fieldnames=['user_id', 'movie_id', 'rating', 'something_else'], delimiter='\t')
+        for row in reader:
+            user_id = int(row['user_id'])
+            movie_id = int(row['movie_id'])
+            rating = int(row['rating']
+            if user_id in users:
+                users[user_id].add_rating(user_id, movie_id, rating)
+            else:
+                users.update({user_id: User(user_id, movie_id, rating)})
+    return users
 
 
 def main():
     movies = get_movies()
     # for movie_id, movie in movies.items():
     #     print("Movie ID: ", movie.movie_id, "Movie Title: ", movie.movie_title)
-
+    users = get_users()
 
 if __name__ == '__main__':
     main()

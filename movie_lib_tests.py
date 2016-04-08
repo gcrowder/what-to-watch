@@ -26,8 +26,14 @@ class TestRating(unittest.TestCase):
     def test_assert_equal_average_rating(self):
         self.assertEqual(ratings.average_rating(movie_id=1), 4.5)
 
-    def test_assert_equal_user_ratings(self):
-        self.assertEqual(ratings.users_ratings(user_id=81), {3: 4})
+    def test_assert_equal_users_ratings(self):
+        self.assertEqual(ratings.users_ratings(user_id=81), {3 : 4})
+
+    def test_assert_equal_movies_ratings(self):
+        self.assertEqual(ratings.movies_ratings(movie_id=2), {5 : 3, 268 : 2})
+
+    def test_assert_equal_get_movie_title(self):
+        self.assertEqual(ratings.get_movie_title(movie_id=3), 'Four Rooms (1995)')
 
 
 

@@ -1,13 +1,13 @@
 class Movie:
-    def __init__(self, movie_id, movie_title, release_date, user_id=0, rating=0):
+    def __init__(self, movie_id, movie_title, release_date):
         self.movie_id = movie_id
         self.movie_title = movie_title
         self.release_date = release_date
-        self.ratings = {user_id : rating}
+        self.ratings = {}
 
-        def add_rating(movie_id, user_id, rating):
-            if self.movie_id == movie_id:
-                self.ratings.update({user_id: rating})
+    def add_rating(self, movie_id, user_id, rating):
+        if self.movie_id == movie_id:
+            self.ratings.update({user_id: rating})
 
 class User:
     def __init__(self, user_id, movie_id, rating):
@@ -23,18 +23,18 @@ class Rating:
         self.movies = movies #{movie_id : movie_object}
         self.users = users #{user_id : user object}
 
-    def average_rating(movie_id):
+    def average_rating(self, movie_id):
         movie = self.movies[movie_id]
-        return (sum(movie.ratings.values)) / len(movie.ratings)
+        return (sum(movie.ratings.values())) / len(movie.ratings)
 
-    def users_ratings(user_id):
+    def users_ratings(self, user_id):
         user = self.users[user_id]
         return user.ratings
 
-    def movies_ratings(movie_id):
+    def movies_ratings(self, movie_id):
         movie = self.movies[movie_id]
         return movie.ratings
 
-    def get_movie_title(movie_id):
+    def get_movie_title(self, movie_id):
         movie = self.movies[movie_id]
         return movie.title

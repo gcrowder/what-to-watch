@@ -5,11 +5,18 @@ class Movie:
         self.release_date = release_date
         self.ratings = {user_id : rating}
 
+        def add_rating(movie_id, user_id, rating):
+            if self.movie_id == movie_id:
+                self.ratings.update({user_id: rating})
+
 class User:
     def __init__(self, user_id, movie_id, rating):
         self.user_id = user_id
         self.ratings = {movie_id : rating}
 
+    def add_rating(self, user_id, movie_id, rating):
+        if self.user_id == user_id:
+            self.ratings.update({movie_id : rating})
 
 class Rating:
     def __init__(self, movies, users):

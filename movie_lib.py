@@ -7,7 +7,7 @@ class Movie:
 
     def __str__(self):
         return "Movie ID: {} Movie Title {}".format(self.movie_id, self.movie_title)
-        
+
     def add_rating(self, movie_id, user_id, rating):
         if self.movie_id == movie_id:
             self.ratings.update({user_id: rating})
@@ -16,6 +16,8 @@ class User:
     def __init__(self, user_id, movie_id, rating):
         self.user_id = user_id
         self.ratings = {movie_id : rating}
+    def __str__(self):
+        return "User ID: {} Number of ratings: {}".format(self.user_id, len(self.ratings))
 
     def add_rating(self, user_id, movie_id, rating):
         if self.user_id == user_id:

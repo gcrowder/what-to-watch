@@ -3,3 +3,4 @@
 .direnv
 ml100k.zip
 ml-100k
+__pycache__

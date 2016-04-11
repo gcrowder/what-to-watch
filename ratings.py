@@ -4,6 +4,17 @@ from datetime import datetime
 from movie_lib import Movie, User, Rating
 import math
 import argparse
+import sys
+
+# def get_user_id():
+#     parser = argparse.ArgumentParser(description="Show top and recommended movies for a given user. Show top movies if no user given.")
+#     parser.add_argument("user_id", help="user id of user in dataset",
+#                         type=int, default=0)
+#     args = parser.parse_args()
+#     if args.user_id < 0 or args.user_id > 943:
+#         print("That is not a valid user id. Please enter an id from 1-943.")
+#         sys.exit(1)
+#     return args.user_id
 
 def format_time(date):
     try:
@@ -128,27 +139,33 @@ def find_top_movies_from_closest_users(ratings_object, given_user, closest_users
         if len(ratings) > 2:
             averaged_movie_ratings.append((movie_id, (sum(ratings) / len(ratings))))
     descending_averaged_movie_ratings = sorted(averaged_movie_ratings, key=operator.itemgetter(1), reverse=True)
-    print(descending_averaged_movie_ratings)
     return descending_averaged_movie_ratings
 
 def main():
+    parser = argparse.ArgumentParser(description="Show top and recommended movies for a given user. Show top movies if no user given.")
+    parser.add_argument("user_id", nargs='?', help="user id of user in dataset",
+                        type=int, default=0)
+    args = parser.parse_args()
+    if args.user_id < 0 or args.user_id > 943:
+        print("That is not a valid user id. Please enter an id from 1-943.")
+        sys.exit(1)
+    else:
+        user_id = args.user_id
+
     movie_user_ratings = prepare_ratings()
     pop_movies = most_popular_movies(movie_user_ratings)
-    user_id = 645
-    user_one = 431
-    user_two = 874
-    recommended_movies = top_rated_unseen_movies(movie_user_ratings, user_id)
     print("Top 20 Films Overall: ")
     show_movies(movie_user_ratings, pop_movies)
+    if user_id == 0:
+        sys.exit(0)
+    recommended_movies = top_rated_unseen_movies(movie_user_ratings, user_id)
+    print("\n\n")
     print("Top 20 Films Recommended for User: {}".format(user_id))
     show_movies(movie_user_ratings, recommended_movies)
-    list_one, list_two = make_lists_for_euclid_distance(movie_user_ratings, user_one, user_two)
-    distance = euclidean_distance(list_one, list_two)
-    print("Euclidean distance for users {} and {}: {}".format(user_one, user_two, round(distance, 2)))
-    given_user = 431
-    ten_closest_users = find_close_users(movie_user_ratings, given_user)
-    top_close_movies = find_top_movies_from_closest_users(movie_user_ratings, given_user, ten_closest_users)
-    print("Top 20 Films Recommended for User {} by the 10 Closest Users: ".format(given_user))
+    ten_closest_users = find_close_users(movie_user_ratings, user_id)
+    top_close_movies = find_top_movies_from_closest_users(movie_user_ratings, user_id, ten_closest_users)
+    print("\n\n")
+    print("Top 20 Films Recommended for User {} by the 10 Closest Users: ".format(user_id))
     show_movies(movie_user_ratings, top_close_movies)
 
 

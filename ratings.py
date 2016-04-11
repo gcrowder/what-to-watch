@@ -2,8 +2,8 @@ import csv
 import operator
 from datetime import datetime
 from movie_lib import Movie, User, Rating
-import random
-
+import math
+import argparse
 
 def format_time(date):
     try:
@@ -72,17 +72,84 @@ def top_rated_unseen_movies(ratings_object, user_id):
     descending_averaged_movie_ratings = sorted(averaged_movie_ratings, key=operator.itemgetter(1), reverse=True)
     return descending_averaged_movie_ratings
 
+def make_lists_for_euclid_distance(ratings_object, user_one, user_two):
+    user_one_reviews = ratings_object.users[user_one].ratings.copy()
+    user_two_reviews = ratings_object.users[user_two].ratings.copy()
+
+    intersect_user_one = []
+    intersect_user_two = []
+    movies = []
+
+    for movie, rating in user_one_reviews.items():
+        if movie in user_two_reviews:
+            intersect_user_one.append(rating)
+            intersect_user_two.append(user_two_reviews[movie])
+            movies.append(movie)
+
+    return intersect_user_one, intersect_user_two
+
+def euclidean_distance(v, w):
+    """Given two lists, give the Euclidean distance between them on a scale
+    of 0 to 1. 1 means the two lists are identical.
+    """
+
+    # Guard against empty lists.
+    if len(v) is 0:
+        return 0
+
+    # Note that this is the same as vector subtraction.
+    differences = [v[idx] - w[idx] for idx in range(len(v))]
+    squares = [diff ** 2 for diff in differences]
+    sum_of_squares = sum(squares)
+
+    return 1 / (1 + math.sqrt(sum_of_squares))
+
+def find_close_users(ratings_object, given_user):
+    closeness = []
+    for user in ratings_object.users:
+        list_one, list_two = make_lists_for_euclid_distance(ratings_object, given_user, user)
+        difference = euclidean_distance(list_one, list_two)
+        closeness.append((user, difference))
+
+    closest_users = sorted(closeness, key=operator.itemgetter(1), reverse=True)
+    return closest_users[:10]
+
+def find_top_movies_from_closest_users(ratings_object, given_user, closest_users):
+    close_movie_ratings = {}
+    for user, distance in closest_users:
+        for movie_id, rating in ratings_object.users[user].ratings.items():
+            if given_user not in ratings_object.movies[movie_id].ratings:
+                if movie_id in close_movie_ratings:
+                    close_movie_ratings[movie_id].append(rating * distance)
+                else:
+                    close_movie_ratings.update({movie_id : [rating * distance]})
+    averaged_movie_ratings = []
+    for movie_id, ratings in close_movie_ratings.items():
+        if len(ratings) > 2:
+            averaged_movie_ratings.append((movie_id, (sum(ratings) / len(ratings))))
+    descending_averaged_movie_ratings = sorted(averaged_movie_ratings, key=operator.itemgetter(1), reverse=True)
+    print(descending_averaged_movie_ratings)
+    return descending_averaged_movie_ratings
+
 def main():
     movie_user_ratings = prepare_ratings()
     pop_movies = most_popular_movies(movie_user_ratings)
-    user_id = random.randint(1,943)
+    user_id = 645
+    user_one = 431
+    user_two = 874
     recommended_movies = top_rated_unseen_movies(movie_user_ratings, user_id)
     print("Top 20 Films Overall: ")
     show_movies(movie_user_ratings, pop_movies)
     print("Top 20 Films Recommended for User: {}".format(user_id))
     show_movies(movie_user_ratings, recommended_movies)
-
-
+    list_one, list_two = make_lists_for_euclid_distance(movie_user_ratings, user_one, user_two)
+    distance = euclidean_distance(list_one, list_two)
+    print("Euclidean distance for users {} and {}: {}".format(user_one, user_two, round(distance, 2)))
+    given_user = 431
+    ten_closest_users = find_close_users(movie_user_ratings, given_user)
+    top_close_movies = find_top_movies_from_closest_users(movie_user_ratings, given_user, ten_closest_users)
+    print("Top 20 Films Recommended for User {} by the 10 Closest Users: ".format(given_user))
+    show_movies(movie_user_ratings, top_close_movies)
 
 
 if __name__ == '__main__':
